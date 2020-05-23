@@ -39,6 +39,8 @@
             this.buttonGoHome = new System.Windows.Forms.Button();
             this.textBoxAmount = new System.Windows.Forms.TextBox();
             this.labelAmountOfTasks = new System.Windows.Forms.Label();
+            this.labelSeed = new System.Windows.Forms.Label();
+            this.textBoxSeed = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // buttonTask2
@@ -153,7 +155,7 @@
             this.textBoxAmount.Name = "textBoxAmount";
             this.textBoxAmount.Size = new System.Drawing.Size(116, 33);
             this.textBoxAmount.TabIndex = 9;
-            this.textBoxAmount.Text = "5";
+            this.textBoxAmount.Text = "1";
             // 
             // labelAmountOfTasks
             // 
@@ -165,12 +167,33 @@
             this.labelAmountOfTasks.TabIndex = 10;
             this.labelAmountOfTasks.Text = "Сколько задач сгенерировать?";
             // 
+            // labelSeed
+            // 
+            this.labelSeed.AutoSize = true;
+            this.labelSeed.Font = new System.Drawing.Font("Meiryo", 13F, System.Drawing.FontStyle.Bold);
+            this.labelSeed.Location = new System.Drawing.Point(438, 245);
+            this.labelSeed.Name = "labelSeed";
+            this.labelSeed.Size = new System.Drawing.Size(253, 27);
+            this.labelSeed.TabIndex = 12;
+            this.labelSeed.Text = "Введите номер задания:";
+            // 
+            // textBoxSeed
+            // 
+            this.textBoxSeed.Font = new System.Drawing.Font("Meiryo", 13F, System.Drawing.FontStyle.Bold);
+            this.textBoxSeed.Location = new System.Drawing.Point(443, 302);
+            this.textBoxSeed.Name = "textBoxSeed";
+            this.textBoxSeed.Size = new System.Drawing.Size(116, 33);
+            this.textBoxSeed.TabIndex = 11;
+            this.textBoxSeed.Text = "0";
+            // 
             // FormTypeSelection
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Ivory;
             this.ClientSize = new System.Drawing.Size(841, 570);
+            this.Controls.Add(this.labelSeed);
+            this.Controls.Add(this.textBoxSeed);
             this.Controls.Add(this.labelAmountOfTasks);
             this.Controls.Add(this.textBoxAmount);
             this.Controls.Add(this.buttonGoHome);
@@ -203,6 +226,8 @@
         private System.Windows.Forms.TextBox textBoxAmount;
         private System.Windows.Forms.Label labelAmountOfTasks;
         private System.Windows.Forms.Button buttonStart;
+        private System.Windows.Forms.Label labelSeed;
+        private System.Windows.Forms.TextBox textBoxSeed;
     }
 }
 

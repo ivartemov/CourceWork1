@@ -21,18 +21,26 @@ namespace FormTypeSelection
             buttonGoHome.Hide();
             buttonAnswersMode.Hide();
             buttonSaveFile.Hide();
+            labelSeed.Hide();
             labelAmountOfTasks.Hide();
             labelAnswersMode.Hide();
             labelChooseTypeOfTask.Hide();
+            textBoxSeed.Hide();
             textBoxAmount.Hide();
             buttonTask1.Hide();
             buttonTask2.Hide();
             labelAnswersMode.Text = "Показывать ответы?";
             labelChooseTypeOfTask.Text = "Выберите тип задания: ";
             labelAmountOfTasks.Text = "Сколько задач сгенерировать?";
-            textBoxAmount.Text = "5";
             buttonAnswersMode.Text = "Да";
-
+            
+            ChoosedTask = 0;
+            AmountOfTasks = 1;
+            textBoxSeed.Text = "0";
+            textBoxAmount.Text = "1";
+            CustomSeed = 0;
+            Tasks = new List<string>();
+            Answers = new List<string>();
 
             //#region initialising events for buttons
 
@@ -48,15 +56,10 @@ namespace FormTypeSelection
 
 
             //#endregion
-
-
-            Tasks = new List<string>();
-            Answers = new List<string>();
-            ChoosedTask = 0;
-            AmountOfTasks = 0;
         }
 
         private bool AnswersMode { get; set; } = true;
+        private bool GenWithCustomSeed { get; set; } = false;
 
         private List<string> Tasks;
         private List<string> Answers;
@@ -64,8 +67,9 @@ namespace FormTypeSelection
         private int ChoosedTask { get; set; }
         private string FilePath { get; set; }
         private int AmountOfTasks { get; set; }
+        private long CustomSeed { get; set; }
 
-        
+
         private void StartEvent(object sender, EventArgs e)
         {
             buttonStart.Hide();
@@ -77,13 +81,28 @@ namespace FormTypeSelection
 
         private void SaveButtonClick(object sender, EventArgs e)
         {
-            if (!int.TryParse((textBoxAmount.Text), out int input) || input < 1 || input > 99)
+            if (!int.TryParse((textBoxAmount.Text), out int inputAmount) || inputAmount < 1 || inputAmount > 100)
             {
-                MessageBox.Show("Введите число от 1 до 99", "Количество задач");
+                MessageBox.Show("Введите число от 1 до 100", "Количество заданий");
             }
-            else
+            else if (!long.TryParse((textBoxSeed.Text), out long inputSeed) || (inputSeed < 100000 && inputSeed != 0) || (inputSeed > 999999 && inputSeed < 10000000000) || inputSeed > 99999999999)
             {
-                AmountOfTasks = input;
+                MessageBox.Show("Введите число, состоящее из 6 цифр либо из 11", "Номер задания");
+            }
+            else if (inputSeed != 0 && inputAmount != 1)
+            {
+                MessageBox.Show("Вы ввели номер задания. Кол-во заданий: 1.\rЕсли хотите создать случайные задания, поставьте номер задания: 0", "Количество заданий");
+                textBoxAmount.Text = "1";
+                inputAmount = 1;
+            }
+            else if (inputAmount > 0)
+            {
+                AmountOfTasks = inputAmount;
+                CustomSeed = inputSeed;
+                if (CustomSeed == 0)
+                    GenWithCustomSeed = false;
+                else
+                    GenWithCustomSeed = true;
                 switch (ChoosedTask)
                 {
                     case 0:
@@ -113,7 +132,14 @@ namespace FormTypeSelection
 
         private void GenerateEx_1(object sender, EventArgs e)
         {
-            Ex_1.GenerateExercise(AmountOfTasks);
+            bool flag = GenWithCustomSeed;
+            Ex_1.GenerateExercise(AmountOfTasks, CustomSeed, ref flag);
+            if (!flag)
+            {
+                MessageBox.Show("Такого задания не существует, сгенерируйте задания случайно и сохраните их номера.", "Номер задания");
+                GoToMenu();
+                return;
+            }
             Tasks = Ex_1.Tasks;
             Answers = Ex_1.Answers;
             Seeds = Ex_1.Seeds;
@@ -121,19 +147,18 @@ namespace FormTypeSelection
 
         private void GenerateEx_2(object sender, EventArgs e)
         {
-            Ex_2.GenerateExercise(AmountOfTasks);
+            bool flag = GenWithCustomSeed;
+            Ex_2.GenerateExercise(AmountOfTasks, CustomSeed, ref flag);
+            if (!flag)
+            {
+                MessageBox.Show("Такого задания не существует, сгенерируйте задания случайно и сохраните их номера.", "Номер задания");
+                GoToMenu();
+                return;
+            }
             Tasks = Ex_2.Tasks;
             Answers = Ex_2.Answers;
             Seeds = Ex_2.Seeds;
         }
-
-        //private void GenerateEx_3(object sender, EventArgs e)
-        //{
-        //    Ex_3.GenerateExercise(AmountOfTasks);
-        //    Tasks = Ex_3.Tasks;
-        //    Answers = Ex_3.Answers;
-        //    Seeds = Ex_3.Seeds;
-        //}
 
         private string CreateTextOfTasks()
         {
@@ -155,8 +180,10 @@ namespace FormTypeSelection
             buttonSaveFile.Show();
             buttonAnswersMode.Show();
             labelAnswersMode.Show();
-            textBoxAmount.Show();
             labelAmountOfTasks.Show();
+            labelSeed.Show();
+            textBoxAmount.Show();
+            textBoxSeed.Show();
         }
 
         private void Task1Choosed(object sender, EventArgs e)
@@ -199,13 +226,16 @@ namespace FormTypeSelection
             Tasks = new List<string>();
             Answers = new List<string>();
             Seeds = new List<long>();
-            AmountOfTasks = 0;
+            AmountOfTasks = 1;
             ChoosedTask = 0;
-            textBoxAmount.Text = "5";
+            textBoxAmount.Text = "1";
             FilePath = null;
             AnswersMode = true;
             buttonAnswersMode.Text = "Да";
-        }
+            GenWithCustomSeed = false;
+            textBoxSeed.Text = "0";
+            CustomSeed = 0;
+    }
 
         public void SavingFile(string tasksText)
         {

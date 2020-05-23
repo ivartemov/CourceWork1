@@ -8,9 +8,9 @@ namespace FormTypeSelection
 {
     public class Ex_1
     {
-        public static List<string> Tasks { get; set; } = new List<string>();
-        public static List<string> Answers { get; set; } = new List<string>();
-        public static List<long> Seeds { get; set; } = new List<long>();
+        public static List<string> Tasks { get; set; } 
+        public static List<string> Answers { get; set; } 
+        public static List<long> Seeds { get; set; } 
 
 
         private static readonly Random rnd = new Random();
@@ -34,7 +34,78 @@ namespace FormTypeSelection
                 return false;
         }
 
-        private static List<int> GenerateCoefs(ref long seed)
+        private static List<int> GenerateCoefsWithCustomSeed(long seed, ref bool flag)
+        {
+            long creatingSeed;
+            if (seed > 1000000000)
+            {
+                creatingSeed = seed / 10000000000;
+                seed %= 10000000000;
+                List<int> coefs = new List<int>() { 0, 0, 0, 0, 0 };
+
+                // уравнение вида  145(x)  +  24(10)  =  127(9)
+                // P.s. В скобках система счисления
+                int x = MyRnd(creatingSeed).Next(7, 17); // В примере - X
+                creatingSeed = creatingSeed * 100 + (seed / 100000000);
+                seed %= 100000000;
+                int notation = MyRnd(creatingSeed).Next(6, 10); // В примере - 9
+                creatingSeed = creatingSeed * 10 + (seed / 10000000);
+                seed %= 10000000;
+                int a = MyRnd(creatingSeed).Next(70, 350); // В примере 145
+                creatingSeed = creatingSeed * 100 + (seed / 100000);
+                seed %= 100000;
+                int c = MyRnd(creatingSeed).Next(100, 500); // В примере 127
+                // цикл пошел второй раз
+                x = MyRnd(creatingSeed).Next(7, 17); // В примере - X
+                creatingSeed = creatingSeed * 100 + (seed / 1000);
+                seed %= 1000;
+                notation = MyRnd(creatingSeed).Next(6, 10); // В примере - 9
+                creatingSeed = creatingSeed * 10 + (seed / 100);
+                seed %= 100;
+                a = MyRnd(creatingSeed).Next(70, 350); // В примере 145
+                creatingSeed = creatingSeed * 100 + seed;
+                c = MyRnd(creatingSeed).Next(100, 500); // В примере 127
+
+                if (CoefsCheckWasSuccessful(a, x, c, notation, out int b))
+                {
+                    coefs = new List<int>() { a, b, c, x, notation };
+                    flag = true;
+                }
+                else
+                    flag = false;
+                return coefs;
+            }
+            else
+            {
+                creatingSeed = seed / 100000;
+                seed %= 100000;
+                List<int> coefs = new List<int>() { 0, 0, 0, 0, 0 };
+
+                // уравнение вида  145(x)  +  24(10)  =  127(9)
+                // P.s. В скобках система счисления
+                int x = MyRnd(creatingSeed).Next(7, 17); // В примере - X
+                creatingSeed = creatingSeed * 100 + (seed / 1000);
+                seed %= 1000;
+                int notation = MyRnd(creatingSeed).Next(6, 10); // В примере - 9
+                creatingSeed = creatingSeed * 10 + (seed / 100);
+                seed %= 100;
+                int a = MyRnd(creatingSeed).Next(70, 350); // В примере 145
+                creatingSeed = creatingSeed * 100 + seed;
+                int c = MyRnd(creatingSeed).Next(100, 500); // В примере 127
+
+                if (CoefsCheckWasSuccessful(a, x, c, notation, out int b))
+                {
+                    coefs = new List<int>() { a, b, c, x, notation };
+                    flag = true;
+                }
+                else
+                    flag = false;
+                return coefs;
+            }
+
+        }
+
+        private static List<int> GenerateCoefsWithNewSeed(ref long seed)
         {
             List<int> coefs;
             while (true)
@@ -46,7 +117,7 @@ namespace FormTypeSelection
                 int notation = MyRnd(seed).Next(6, 10); // В примере - 9
                 seed = ChangeSeed(seed, 1);
                 int a = MyRnd(seed).Next(70, 350); // В примере 145
-                seed = ChangeSeed(seed, 10); 
+                seed = ChangeSeed(seed, 10);
                 int c = MyRnd(seed).Next(100, 500); // В примере 127
                 if (CoefsCheckWasSuccessful(a, x, c, notation, out int b))
                 {
@@ -59,13 +130,28 @@ namespace FormTypeSelection
             return coefs;
         }
 
-        public static void GenerateExercise(int amount)
+        public static void GenerateExercise(int amount, long customSeed, ref bool genWithCustomSeed)
         {
+            Tasks = new List<string>();
+            Answers = new List<string>();
+            Seeds = new List<long>();
             for (int i = 0; i < amount; i++)
             {
-                long seed = rnd.Next(1, 100); // seed будет изменяться и в итоге будет состоять из > 6 цифр
-                List<int> coefs = GenerateCoefs(ref seed);
-                Seeds.Add(seed);
+                List<int> coefs;
+                if (!genWithCustomSeed)
+                {
+                    long newSeed = rnd.Next(1, 10); // seed будет изменяться и в итоге будет состоять из 6/11 цифр
+                    coefs = GenerateCoefsWithNewSeed(ref newSeed);
+                    Seeds.Add(newSeed);                    
+                }
+                else
+                {
+                    coefs = GenerateCoefsWithCustomSeed(customSeed, ref genWithCustomSeed);
+                    if (!genWithCustomSeed)
+                        return;
+                    Seeds.Add(customSeed);
+                }
+
                 string textTask = $"Дано выражение:  {coefs[0]}<sub>x</sub> ";
                 if (coefs[1] >= 0)
                     textTask += "+";
@@ -79,6 +165,8 @@ namespace FormTypeSelection
                 Tasks.Add(textTask);
                 Answers.Add(textAnswer);
             }
+            if (customSeed == 0)
+                genWithCustomSeed = true;
         }
     }
 }
